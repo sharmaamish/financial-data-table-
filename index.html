@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Data Table | NiftyInvest Style</title>
+<link href="https://unpkg.com/tabulator-tables@6.2.0/dist/css/tabulator.min.css" rel="stylesheet">
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f8fafc;
+  color: #1e293b;
+  margin: 0;
+  padding: 0;
+}
+.app-container {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 10px 15px;
+}
+h1 {
+  font-weight: 600;
+  color: #1e293b;
+  margin: 10px 0 15px;
+  text-align: center;
+  font-size: 22px;
+}
+
+/* Loader (skeleton) */
+.loader {
+  width: 100%;
+  height: 250px;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* Custom Compact Tabulator Theme */
+.tabulator {
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  font-size: 13px;
+  background-color: #ffffff !important; /* ✅ make table background white */
+}
+.tabulator-tableholder {
+  background-color: #ffffff !important; /* ✅ remove dark filler area */
+}
+.tabulator-footer {
+  background-color: #f8fafc !important;
+  border-top: 1px solid #e2e8f0;
+}
+.tabulator-header {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  color: #334155;
+}
+.tabulator-row {
+  transition: background 0.15s ease;
+  background-color: #ffffff;
+}
+.tabulator-row:hover {
+  background: #f9fafb;
+}
+.positive { color: #16a34a; font-weight: 600; }
+.negative { color: #dc2626; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="app-container">
+  <h1>📊 Market Watch</h1>
+  <div id="loader" class="loader"></div>
+  <div id="stock-table" style="display:none;"></div>
+</div>
+
+<script src="https://unpkg.com/tabulator-tables@6.2.0/dist/js/tabulator.min.js"></script>
+<script>
+const stockData = [
+  {"symbol":"SBIN","name":"State Bank of India","ltp":735.25,"change":5.30,"percentChange":0.73,"dayHigh":742.00,"dayLow":728.10},
+  {"symbol":"RELIANCE","name":"Reliance Industries Ltd","ltp":2538.40,"change":-12.60,"percentChange":-0.49,"dayHigh":2562.75,"dayLow":2521.30},
+  {"symbol":"TCS","name":"Tata Consultancy Services Ltd","ltp":3872.10,"change":28.90,"percentChange":0.75,"dayHigh":3890.00,"dayLow":3835.50},
+  {"symbol":"INFY","name":"Infosys Ltd","ltp":1534.80,"change":-6.10,"percentChange":-0.40,"dayHigh":1552.20,"dayLow":1528.00},
+  {"symbol":"HDFC","name":"HDFC Bank Ltd","ltp":1652.55,"change":9.75,"percentChange":0.59,"dayHigh":1665.00,"dayLow":1641.00}
+];
+
+setTimeout(() => {
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("stock-table").style.display = "block";
+
+  new Tabulator("#stock-table", {
+    data: stockData,
+    layout: "fitColumns",
+    responsiveLayout: "collapse",
+    pagination: "local",
+    paginationSize: 5,
+    columns: [
+      { title:"Symbol", field:"symbol", width:90, headerSort:true },
+      { title:"Company", field:"name", minWidth:180 },
+      { title:"LTP (₹)", field:"ltp", hozAlign:"right", formatter:"money", formatterParams:{precision:2} },
+      {
+        title:"Change (₹)", field:"change", hozAlign:"right",
+        formatter:cell=>{
+          const v=cell.getValue(),cls=v>=0?"positive":"negative";
+          return `<span class="${cls}">${v.toFixed(2)}</span>`;
+        }
+      },
+      {
+        title:"% Change", field:"percentChange", hozAlign:"right",
+        formatter:cell=>{
+          const v=cell.getValue(),cls=v>=0?"positive":"negative";
+          return `<span class="${cls}">${v.toFixed(2)}%</span>`;
+        }
+      },
+      { title:"High", field:"dayHigh", hozAlign:"right" },
+      { title:"Low", field:"dayLow", hozAlign:"right" }
+    ],
+  });
+}, 1500);
+</script>
+</body>
+</html>
